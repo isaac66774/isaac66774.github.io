@@ -6,6 +6,11 @@
   <!-- ZIP library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
+  <script>
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("dragstart", e => e.preventDefault());
+  </script>
+
   <style>
     :root {
       --bg: #111;
@@ -63,7 +68,10 @@
       width: 100%;
       border-radius: 10px;
       display: block;
+      user-select: none;
+      pointer-events: none;
     }
+
 
     /* Download icon */
     .download {
