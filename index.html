@@ -6,124 +6,198 @@
   <!-- ZIP library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-  <script>
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("dragstart", e => e.preventDefault());
-  </script>
-  
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#111111">
 
   <style>
-    :root {
-      --bg: #111;
-      --text: #fff;
-      --card: #1e1e1e;
-    }
+/* ---- H2 Modern Style ---- */
+h2 {
+  font-size: clamp(28px, 4vw, 40px);
+  margin-top: 50px;
+  margin-bottom: 25px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  position: relative;
+  color: #ff4081;
+  text-transform: uppercase;
+}
 
-    body.light {
-      --bg: #f4f4f4;
-      --text: #000;
-      --card: #fff;
-    }
+h2::after {
+  content: "";
+  display: block;
+  width: 70px;
+  height: 4px;
+  background: linear-gradient(90deg, #ff4081, #ff80ab);
+  margin-top: 10px;
+  border-radius: 5px;
+}
 
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: 0.3s;
-    }
+/* ---- Variables ---- */
+:root {
+  --bg: #111;
+  --text: #fff;
+  --card: #1e1e1e;
+}
 
-    h1 { text-align: center; }
-    .top-bar {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
+body.light {
+  --bg: #f4f4f4;
+  --text: #000;
+  --card: #fff;
+}
 
-    button {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: #007bff;
-      color: white;
-    }
+/* ---- Body ---- */
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: 0.3s;
+}
 
-    /* Pinterest layout */
-    .gallery {
-      column-count: 4;
-      column-gap: 15px;
-    }
+h1 { text-align: center; }
 
-    .item {
-      break-inside: avoid;
-      margin-bottom: 15px;
-      position: relative;
-    }
+/* ---- Top bar ---- */
+.top-bar {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
 
-    .item img {
-      width: 100%;
-      border-radius: 10px;
-      display: block;
-      user-select: none;
-      pointer-events: none;
-    }
+button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  transition: transform 0.1s ease;
+}
 
+button:active { transform: scale(0.92); }
 
-    /* Download icon */
-    .download {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      padding: 6px;
-      border-radius: 50%;
-      font-size: 14px;
-      text-decoration: none;
-    }
+/* ---- Gallery ---- */
+.gallery {
+  column-count: 4;
+  column-gap: 18px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
 
-    /* Watermark */
-    .watermark {
-      position: absolute;
-      bottom: 8px;
-      left: 10px;
-      font-size: 12px;
-      opacity: 0.6;
-    }
+.gallery.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-    @media (max-width: 1000px) { .gallery { column-count: 3; } }
-    @media (max-width: 700px) { .gallery { column-count: 2; } }
-    @media (max-width: 450px) { .gallery { column-count: 1; } }
+.item {
+  break-inside: avoid;
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
 
-    .hidden { display: none; }
+/* Skeleton loader */
+.item img {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+  user-select: none;
+  pointer-events: none;
 
+  /* skeleton effect */
+  background: #333;
+  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.item img.loaded {
+  opacity: 1;
+  transform: translateY(0);
+  animation: none;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ---- Download icon ---- */
+.download {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 10px;
+  border-radius: 50%;
+  font-size: 18px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease, opacity 0.3s;
+}
+
+.hide-downloads .download {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+/* ---- Watermark ---- */
+.watermark {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* ---- Jump buttons ---- */
 .jump-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  padding: 10px 14px;
+  padding: 14px 18px;
   border-radius: 50px;
   border: none;
   cursor: pointer;
   background: #ff4081;
   color: white;
-  font-size: 14px;
+  font-size: 16px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  backdrop-filter: blur(6px);
   z-index: 999;
+  transition: transform 0.1s ease;
 }
 
+.jump-btn:active { transform: scale(0.92); }
+
+.top-btn {
+  bottom: 70px;
+  background: #00c853;
+  display: none;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1000px) { .gallery { column-count: 3; } }
+@media (max-width: 700px) { .gallery { column-count: 2; } }
+@media (max-width: 450px) { .gallery { column-count: 1; } }
+
+.hidden { display: none; }
   </style>
 </head>
 
 <body>
-
 <button class="jump-btn" onclick="goToQuotes()">👀 Watch out</button>
+<button class="jump-btn top-btn" onclick="goToTop()">⬆ Top</button>
 
 <audio id="bgMusic" loop>
   <source src="music/bg.mp3" type="audio/mpeg">
@@ -138,63 +212,54 @@
 </div>
 
 <h2>🔥 Skins Hand Picked</h2>
-
 <div class="gallery" id="public"></div>
 
-<h2 id="quotesSection">💬  Quotes MMD</h2>
-
+<h2 id="quotesSection">💬 Quotes MMD</h2>
 <div class="gallery" id="quotes"></div>
 
 <h2 class="hidden" id="hiddenTitle">🕶 Private Album</h2>
-
 <div class="gallery hidden" id="private">
   <div class="item">
     <img src="photos/private1.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/private1.jpg" download>⬇</a>
+    <span class="watermark">𝓲𝓼𝓪𝓪𝓬 🅴</span>
+    <a class="download" href="photos/private1.jpg" download>🡇</a>
   </div>
 </div>
 
 <script>
-  const PUBLIC_COUNT = 67;
-  const QUOTES_COUNT = 31;
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
 
-  const music = document.getElementById("bgMusic");
+const PUBLIC_COUNT = 67;
+const QUOTES_COUNT = 31;
 
-  document.body.addEventListener("click", () => {
-    if (music.paused) {
-      music.play().catch(() => {});
-    }
-  }, { once: true });
+const music = document.getElementById("bgMusic");
+document.body.addEventListener("click", () => {
+  if (music.paused) music.play().catch(() => {});
+}, { once: true });
 
-  function toggleMode() {
-    document.body.classList.toggle("light");
+function toggleMode() { document.body.classList.toggle("light"); }
+
+function unlock() {
+  const pass = prompt("Enter password:");
+  if (pass === "6677") {
+    document.getElementById("private").classList.remove("hidden");
+    document.getElementById("hiddenTitle").classList.remove("hidden");
+    alert("Unlocked 🔓");
+  } else {
+    alert("Sorry Bruhh ❌");
   }
+}
 
-  function unlock() {
-    const pass = prompt("Enter password:");
-    if (pass === "1234") {
-      document.getElementById("private").classList.remove("hidden");
-      document.getElementById("hiddenTitle").classList.remove("hidden");
-      alert("Unlocked 🔓");
-    } else {
-      alert("Sorry Bruhh ❌");
-    }
-  }
-
-  async function downloadZip() {
+async function downloadZip() {
   const zip = new JSZip();
   const images = [];
-
-  for (let i = 1; i <= PUBLIC_COUNT; i++) {
-    images.push(`photos/photo${i}.jpg`);
-  }
+  for (let i = 1; i <= PUBLIC_COUNT; i++) images.push(`photos/photo${i}.jpg`);
 
   for (let img of images) {
-    const response = await fetch(img);
-    if (!response.ok) continue; 
-
-    const blob = await response.blob();
+    const res = await fetch(img);
+    if (!res.ok) continue;
+    const blob = await res.blob();
     zip.file(img.split("/")[1], blob);
   }
 
@@ -207,36 +272,73 @@
 
 function loadGallery(folder, count, prefix, targetId) {
   const container = document.getElementById(targetId);
-
   for (let i = 1; i <= count; i++) {
-    container.innerHTML += `
-      <div class="item">
-        <img src="${folder}/${prefix}${i}.jpg"
-             loading="lazy"
-             onerror="this.parentElement.remove()">
-        <span class="watermark">🄴 𝓲𝓼𝓪𝓪𝓬</span>
-        <a class="download" href="${folder}/${prefix}${i}.jpg" download>⬇</a>
-      </div>
-    `;
+    const div = document.createElement('div');
+    div.className = 'item';
+
+    const img = document.createElement('img');
+    img.src = `${folder}/${prefix}${i}.jpg`;
+    img.loading = 'lazy';
+    img.onload = () => setTimeout(() => img.classList.add('loaded'), i*50);
+
+    const wm = document.createElement('span');
+    wm.className = 'watermark';
+    wm.textContent = '𝓲𝓼𝓪𝓪𝓬 🅴';
+
+    const dl = document.createElement('a');
+    dl.className = 'download';
+    dl.href = img.src;
+    dl.download = '';
+    dl.textContent = '🡇';
+
+    div.appendChild(img);
+    div.appendChild(wm);
+    div.appendChild(dl);
+    container.appendChild(div);
   }
 }
 
- loadGallery("photos", PUBLIC_COUNT, "photo", "public");
- loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
- 
- function goToQuotes() {
-  document.getElementById("quotesSection")
-    .scrollIntoView({ behavior: "smooth" });
+// load galleries
+loadGallery("photos", PUBLIC_COUNT, "photo", "public");
+loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
+
+function toggleMusic() {
+  if (music.paused) music.play();
+  else music.pause();
 }
 
- const jumpBtn = document.querySelector(".jump-btn");
- const quotesSection = document.getElementById("quotesSection");
+function goToQuotes() {
+  document.getElementById("quotesSection").scrollIntoView({ behavior: "smooth" });
+}
 
- window.addEventListener("scroll", () => {
+const jumpBtn = document.querySelector(".jump-btn:not(.top-btn)");
+const quotesSection = document.getElementById("quotesSection");
+const topBtn = document.querySelector(".top-btn");
+let scrollTimeout;
+
+window.addEventListener("scroll", () => {
+  document.body.classList.add("hide-downloads");
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(() => document.body.classList.remove("hide-downloads"), 250);
+
+  topBtn.style.display = window.scrollY > 500 ? "block" : "none";
   const rect = quotesSection.getBoundingClientRect();
-  jumpBtn.style.display = rect.top < window.innerHeight ? "none" : "block";
- });
+  jumpBtn.style.display = rect.top < 100 ? "none" : "block";
+});
 
+function goToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); }
+
+// fade-in sections on scroll
+function observeSections() {
+  const sections = document.querySelectorAll('.gallery');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+  sections.forEach(sec => observer.observe(sec));
+}
+observeSections();
 </script>
 
 </body>
