@@ -3,171 +3,165 @@
 <head>
   <title>Isaac's Skins Gallery</title>
 
-  <!-- ZIP library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#111111">
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
 <style>
-/* ---------- Variables ---------- */
 :root {
-  --bg: #111;
-  --text: #fff;
-  --card: #1e1e1e;
-  --accent: #ff4081;
+  --bg:#111;
+  --text:#fff;
+  --card:#1e1e1e;
+  --accent:#ff4081;
 }
 
 body.light {
-  --bg: #f4f4f4;
-  --text: #000;
-  --card: #fff;
+  --bg:#f4f4f4;
+  --text:#000;
+  --card:#fff;
 }
 
-/* ---------- Base ---------- */
 body {
-  margin: 0;
-  padding: 18px;
-  font-family: Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  margin:0;
+  padding:18px;
+  font-family:Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 10px;
-}
+h1 { text-align:center; }
 
-/* ---------- Section Titles ---------- */
+/* ---- Titles ---- */
 h2 {
-  font-size: clamp(26px, 4vw, 36px);
-  margin: 45px 0 18px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: var(--accent);
-  text-transform: uppercase;
+  font-size:clamp(24px,4vw,34px);
+  margin:45px 0 18px;
+  font-weight:800;
+  color:var(--accent);
 }
 
 h2::after {
-  content: "";
-  display: block;
-  width: 60px;
-  height: 4px;
-  margin-top: 8px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, #ff4081, #ff80ab);
+  content:"";
+  display:block;
+  width:60px;
+  height:4px;
+  margin-top:8px;
+  background:linear-gradient(90deg,#ff4081,#ff80ab);
+  border-radius:6px;
 }
 
-/* ---------- Top Bar ---------- */
+/* ---- Buttons ---- */
 .top-bar {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
 }
 
 button {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  background: #007bff;
-  color: #fff;
-  cursor: pointer;
+  padding:12px 16px;
+  border:none;
+  border-radius:10px;
+  background:#007bff;
+  color:#fff;
+  font-size:16px;
 }
 
-button:active {
-  transform: scale(0.96);
-}
+button:active { transform:scale(.95); }
 
-/* ---------- CLEAN GRID (NO GAPS) ---------- */
+/* ---- CLEAN GRID (NO GAPS) ---- */
 .gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 14px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:14px;
 }
 
-.gallery.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ---------- CARD ---------- */
+/* ---- CARD ---- */
 .item {
-  position: relative;
-  overflow: hidden;
-  border-radius: 14px;
-  background: var(--card);
-  aspect-ratio: 3 / 4; /* 🔥 removes gaps */
+  position:relative;
+  overflow:hidden;
+  border-radius:14px;
+  background:var(--card);
+  aspect-ratio:3/4;
 }
 
-/* ---------- IMAGE ---------- */
+/* ---- IMAGE ---- */
 .item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  opacity: 0;
-  transition: opacity 0.4s ease;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0;
+  transition:opacity .4s ease;
 }
 
-.item img.loaded {
-  opacity: 1;
-}
+.item img.loaded { opacity:1; }
 
-/* ---------- WATERMARK ---------- */
+/* ---- Watermark ---- */
 .watermark {
-  position: absolute;
-  bottom: 8px;
-  left: 10px;
-  font-size: 12px;
-  opacity: 0.6;
+  position:absolute;
+  bottom:8px;
+  left:10px;
+  font-size:12px;
+  opacity:.6;
 }
 
-/* ---------- DOWNLOAD ---------- */
+/* ---- Download ---- */
 .download {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(0,0,0,0.6);
-  padding: 10px;
-  border-radius: 50%;
-  font-size: 18px;
-  color: #fff;
-  text-decoration: none;
+  position:absolute;
+  bottom:8px;
+  right:8px;
+  background:rgba(0,0,0,.6);
+  padding:8px;
+  border-radius:50%;
+  color:#fff;
+  text-decoration:none;
 }
 
-/* ---------- FLOATING BUTTONS ---------- */
+/* ---- Lightbox ---- */
+.lightbox {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.95);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.lightbox img {
+  max-width:100%;
+  max-height:100%;
+}
+
+.lightbox.show { display:flex; }
+
+/* ---- Floating ---- */
 .jump-btn {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  padding: 14px 18px;
-  border-radius: 50px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  z-index: 999;
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  padding:14px 18px;
+  border-radius:50px;
+  background:var(--accent);
+  color:#fff;
+  z-index:999;
 }
 
 .top-btn {
-  bottom: 70px;
-  background: #00c853;
-  display: none;
+  bottom:70px;
+  background:#00c853;
+  display:none;
 }
 
-/* ---------- MOBILE ---------- */
-@media (max-width: 480px) {
+/* ---- Mobile ---- */
+@media(max-width:480px){
   .gallery {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns:repeat(2,1fr);
   }
 }
 
-.hidden { display: none; }
+.hidden{display:none;}
 </style>
 </head>
 
@@ -183,8 +177,8 @@ button:active {
 <h1>liviiii.fr 🍂</h1>
 
 <div class="top-bar">
-  <button onclick="toggleMode()">🌓 Dark / Light</button>
-  <button onclick="downloadZip()">📦 Download All</button>
+  <button onclick="toggleMode()">🌓 Mode</button>
+  <button onclick="downloadZip()">📦 Download</button>
   <button onclick="unlock()">🔐 Hidden</button>
 </div>
 
@@ -197,91 +191,96 @@ button:active {
 <h2 class="hidden" id="hiddenTitle">🕶 Private Album</h2>
 <div class="gallery hidden" id="private"></div>
 
-<script>
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.addEventListener("dragstart", e => e.preventDefault());
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg">
+</div>
 
+<script>
 const PUBLIC_COUNT = 67;
 const QUOTES_COUNT = 31;
+const BATCH = 12;
 
 const music = document.getElementById("bgMusic");
-document.body.addEventListener("click", () => {
-  if (music.paused) music.play().catch(()=>{});
-}, { once: true });
+document.body.addEventListener("click",()=>music.play().catch(()=>{}),{once:true});
 
-function toggleMode() {
-  document.body.classList.toggle("light");
-}
+function toggleMode(){document.body.classList.toggle("light");}
 
-function unlock() {
-  const pass = prompt("Enter password:");
-  if (pass === "6677") {
-    privateGallery.classList.remove("hidden");
+function unlock(){
+  if(prompt("Password")==="6677"){
+    private.classList.remove("hidden");
     hiddenTitle.classList.remove("hidden");
   }
 }
 
-async function downloadZip() {
-  const zip = new JSZip();
-  for (let i = 1; i <= PUBLIC_COUNT; i++) {
-    const res = await fetch(`photos/photo${i}.jpg`);
-    if (!res.ok) continue;
-    zip.file(`photo${i}.jpg`, await res.blob());
+/* ---- Progressive Load ---- */
+function loadGallery(folder,count,prefix,id){
+  const container=document.getElementById(id);
+  let loaded=0;
+
+  function loadBatch(){
+    for(let i=0;i<BATCH && loaded<count;i++){
+      loaded++;
+      const item=document.createElement("div");
+      item.className="item";
+
+      const img=document.createElement("img");
+      img.src=`${folder}/${prefix}${loaded}.jpg`;
+      img.srcset=`
+        ${folder}/${prefix}${loaded}.jpg 800w
+      `;
+      img.loading="lazy";
+      img.onload=()=>img.classList.add("loaded");
+      img.onclick=()=>openLightbox(img.src);
+
+      const wm=document.createElement("span");
+      wm.className="watermark";
+      wm.textContent="𝓲𝓼𝓪𝓪𝓬 🅴";
+
+      const dl=document.createElement("a");
+      dl.className="download";
+      dl.href=img.src;
+      dl.download="";
+      dl.textContent="⬇";
+
+      item.append(img,wm,dl);
+      container.appendChild(item);
+    }
   }
-  const blob = await zip.generateAsync({ type: "blob" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "photos.zip";
-  a.click();
+
+  loadBatch();
+  window.addEventListener("scroll",()=>{
+    if(window.innerHeight+window.scrollY>=document.body.offsetHeight-300){
+      loadBatch();
+    }
+  });
 }
 
-function loadGallery(folder, count, prefix, id) {
-  const container = document.getElementById(id);
-  for (let i = 1; i <= count; i++) {
-    const div = document.createElement("div");
-    div.className = "item";
-
-    const img = document.createElement("img");
-    img.src = `${folder}/${prefix}${i}.jpg`;
-    img.loading = "lazy";
-    img.onload = () => img.classList.add("loaded");
-
-    const wm = document.createElement("span");
-    wm.className = "watermark";
-    wm.textContent = "𝓲𝓼𝓪𝓪𝓬 🅴";
-
-    const dl = document.createElement("a");
-    dl.className = "download";
-    dl.href = img.src;
-    dl.download = "";
-    dl.textContent = "⬇";
-
-    div.append(img, wm, dl);
-    container.appendChild(div);
-  }
+/* ---- Lightbox ---- */
+function openLightbox(src){
+  lightboxImg.src=src;
+  lightbox.classList.add("show");
+}
+function closeLightbox(){
+  lightbox.classList.remove("show");
 }
 
-loadGallery("photos", PUBLIC_COUNT, "photo", "public");
-loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
-
-function goToQuotes() {
-  document.getElementById("quotesSection").scrollIntoView({ behavior: "smooth" });
+/* ---- Nav ---- */
+function goToQuotes(){
+  quotesSection.scrollIntoView({behavior:"smooth"});
+}
+function goToTop(){
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
-const topBtn = document.querySelector(".top-btn");
-window.addEventListener("scroll", () => {
-  topBtn.style.display = window.scrollY > 500 ? "block" : "none";
+window.addEventListener("scroll",()=>{
+  document.querySelector(".top-btn").style.display =
+    window.scrollY>500?"block":"none";
 });
 
-function goToTop() {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-/* fade-in */
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => e.isIntersecting && e.target.classList.add("visible"));
-});
-document.querySelectorAll(".gallery").forEach(g => observer.observe(g));
+/* ---- Load ---- */
+loadGallery("photos",PUBLIC_COUNT,"photo","public");
+loadGallery("quotes",QUOTES_COUNT,"quote","quotes");
 </script>
 
 </body>
