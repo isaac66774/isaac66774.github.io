@@ -67,24 +67,19 @@ h1 { text-align: center; }
 }
 
 button {
-  padding: 12px 16px; /* bigger for touch */
+  padding: 12px 16px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   background: #007bff;
   color: white;
-  transition: transform 0.1s ease;
   font-size: 16px;
 }
-
-button:active { transform: scale(0.95); }
 
 /* ---- Gallery ---- */
 .gallery {
   column-count: 4;
   column-gap: 16px;
-  opacity: 1; /* always visible on mobile */
-  transform: translateY(0);
 }
 
 .item {
@@ -93,37 +88,22 @@ button:active { transform: scale(0.95); }
   position: relative;
   overflow: hidden;
   border-radius: 12px;
-  transition: transform 0.3s ease;
 }
 
-/* Skeleton loader */
 .item img {
   width: 100%;
   display: block;
   border-radius: 12px;
   user-select: none;
   pointer-events: none;
-
-  /* skeleton effect */
-  background: #333;
-  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .item img.loaded {
   opacity: 1;
   transform: translateY(0);
-  animation: none;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
 }
 
 /* ---- Download icon ---- */
@@ -131,13 +111,12 @@ button:active { transform: scale(0.95); }
   position: absolute;
   bottom: 8px;
   right: 8px;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.7);
   color: #fff;
-  padding: 8px;
+  padding: 10px;
   border-radius: 50%;
   font-size: 16px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.4);
-  transition: transform 0.2s ease, opacity 0.3s;
+  cursor: pointer;
 }
 
 /* ---- Watermark ---- */
@@ -163,10 +142,7 @@ button:active { transform: scale(0.95); }
   font-size: 16px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   z-index: 999;
-  transition: transform 0.1s ease;
 }
-
-.jump-btn:active { transform: scale(0.92); }
 
 .top-btn {
   bottom: 70px;
@@ -184,6 +160,7 @@ button:active { transform: scale(0.95); }
 </head>
 
 <body>
+
 <button class="jump-btn" onclick="goToQuotes()">👀 Watch out</button>
 <button class="jump-btn top-btn" onclick="goToTop()">⬆ Top</button>
 
@@ -210,7 +187,7 @@ button:active { transform: scale(0.95); }
   <div class="item">
     <img src="photos/private1.jpg">
     <span class="watermark">𝓲𝓼𝓪𝓪𝓬 🅴</span>
-    <a class="download" href="photos/private1.jpg" download>⬇</a>
+    <button class="download" onclick="forceDownload('photos/private1.jpg')">⬇</button>
   </div>
 </div>
 
@@ -221,13 +198,17 @@ document.addEventListener("dragstart", e => e.preventDefault());
 const PUBLIC_COUNT = 67;
 const QUOTES_COUNT = 31;
 
+/* ---- Music ---- */
 const music = document.getElementById("bgMusic");
 document.body.addEventListener("click", () => {
-  if (music.paused) music.play().catch(() => {});
+  if (music.paused) music.play().catch(()=>{});
 }, { once: true });
 
-function toggleMode() { document.body.classList.toggle("light"); }
+function toggleMode() {
+  document.body.classList.toggle("light");
+}
 
+/* ---- Unlock ---- */
 function unlock() {
   const pass = prompt("Enter password:");
   if (pass === "6677") {
@@ -239,77 +220,84 @@ function unlock() {
   }
 }
 
+/* ---- Force Download (FIX) ---- */
+function forceDownload(url) {
+  fetch(url)
+    .then(res => res.blob())
+    .then(blob => {
+      const a = document.createElement("a");
+      const blobUrl = URL.createObjectURL(blob);
+      a.href = blobUrl;
+      a.download = url.split("/").pop();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+    });
+}
+
+/* ---- ZIP ---- */
 async function downloadZip() {
   const zip = new JSZip();
-  const images = [];
-  for (let i = 1; i <= PUBLIC_COUNT; i++) images.push(`photos/photo${i}.jpg`);
 
-  for (let img of images) {
-    const res = await fetch(img);
+  for (let i = 1; i <= PUBLIC_COUNT; i++) {
+    const path = `photos/photo${i}.jpg`;
+    const res = await fetch(path);
     if (!res.ok) continue;
-    const blob = await res.blob();
-    zip.file(img.split("/")[1], blob);
+    zip.file(`photo${i}.jpg`, await res.blob());
   }
 
-  const content = await zip.generateAsync({ type: "blob" });
+  const blob = await zip.generateAsync({ type: "blob" });
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(content);
+  a.href = URL.createObjectURL(blob);
   a.download = "photos.zip";
   a.click();
 }
 
+/* ---- Gallery Loader ---- */
 function loadGallery(folder, count, prefix, targetId) {
   const container = document.getElementById(targetId);
+
   for (let i = 1; i <= count; i++) {
-    const div = document.createElement('div');
-    div.className = 'item';
+    const div = document.createElement("div");
+    div.className = "item";
 
-    const img = document.createElement('img');
+    const img = document.createElement("img");
     img.src = `${folder}/${prefix}${i}.jpg`;
-    img.loading = 'lazy';
-    img.onload = () => setTimeout(() => img.classList.add('loaded'), i*50);
+    img.loading = "lazy";
+    img.onload = () => img.classList.add("loaded");
 
-    const wm = document.createElement('span');
-    wm.className = 'watermark';
-    wm.textContent = '𝓲𝓼𝓪𝓪𝓬 🅴';
+    const wm = document.createElement("span");
+    wm.className = "watermark";
+    wm.textContent = "𝓲𝓼𝓪𝓪𝓬 🅴";
 
-    const dl = document.createElement('a');
-    dl.className = 'download';
-    dl.href = img.src;
-    dl.download = '';
-    dl.textContent = '⬇';
+    const dl = document.createElement("button");
+    dl.className = "download";
+    dl.textContent = "⬇";
+    dl.onclick = () => forceDownload(img.src);
 
-    div.appendChild(img);
-    div.appendChild(wm);
-    div.appendChild(dl);
+    div.append(img, wm, dl);
     container.appendChild(div);
   }
 }
 
-// Load galleries
 loadGallery("photos", PUBLIC_COUNT, "photo", "public");
 loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
 
+/* ---- Scroll buttons ---- */
 function goToQuotes() {
   document.getElementById("quotesSection").scrollIntoView({ behavior: "smooth" });
 }
 
-const jumpBtn = document.querySelector(".jump-btn:not(.top-btn)");
-const quotesSection = document.getElementById("quotesSection");
 const topBtn = document.querySelector(".top-btn");
-let scrollTimeout;
 
 window.addEventListener("scroll", () => {
-  document.body.classList.add("hide-downloads");
-  clearTimeout(scrollTimeout);
-  scrollTimeout = setTimeout(() => document.body.classList.remove("hide-downloads"), 250);
-
   topBtn.style.display = window.scrollY > 500 ? "block" : "none";
-  const rect = quotesSection.getBoundingClientRect();
-  jumpBtn.style.display = rect.top < 100 ? "none" : "block";
 });
 
-function goToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); }
+function goToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 </script>
 
 </body>
