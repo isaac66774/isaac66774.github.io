@@ -37,22 +37,31 @@ h2::after {
   --bg: #111;
   --text: #fff;
   --card: #1e1e1e;
+  --accent1: #ff4081;
+  --accent2: #ff80ab;
+}
+
+/* Background gradient animation */
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(120deg, #111, #1a1a1a);
+  background-size: 400% 400%;
+  animation: bgAnimate 30s ease infinite;
+  color: var(--text);
+  transition: 0.3s;
+}
+@keyframes bgAnimate {
+  0% {background-position:0% 50%}
+  50% {background-position:100% 50%}
+  100% {background-position:0% 50%}
 }
 
 body.light {
   --bg: #f4f4f4;
   --text: #000;
   --card: #fff;
-}
-
-/* ---- Body ---- */
-body {
-  margin: 0;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  transition: 0.3s;
 }
 
 h1 { text-align: center; }
@@ -75,7 +84,6 @@ button {
   color: white;
   transition: transform 0.1s ease;
 }
-
 button:active { transform: scale(0.92); }
 
 /* ---- Gallery ---- */
@@ -98,6 +106,14 @@ button:active { transform: scale(0.92); }
   position: relative;
   overflow: hidden;
   border-radius: 12px;
+  cursor: pointer;
+  perspective: 1000px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.item:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.5);
 }
 
 /* Skeleton loader */
@@ -108,7 +124,6 @@ button:active { transform: scale(0.92); }
   user-select: none;
   pointer-events: none;
 
-  background: #333;
   background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -117,7 +132,6 @@ button:active { transform: scale(0.92); }
   transform: translateY(20px);
   transition: opacity 0.6s ease, transform 0.6s ease;
 }
-
 .item img.loaded {
   opacity: 1;
   transform: translateY(0);
@@ -142,7 +156,6 @@ button:active { transform: scale(0.92); }
   box-shadow: 0 0 10px rgba(0,0,0,0.4);
   transition: transform 0.2s ease, opacity 0.3s;
 }
-
 .hide-downloads .download {
   opacity: 0;
   pointer-events: none;
@@ -167,7 +180,7 @@ button:active { transform: scale(0.92); }
   border-radius: 50px;
   border: none;
   cursor: pointer;
-  background: #ff4081;
+  background: var(--accent1);
   color: white;
   font-size: 16px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -175,9 +188,7 @@ button:active { transform: scale(0.92); }
   z-index: 999;
   transition: transform 0.1s ease;
 }
-
 .jump-btn:active { transform: scale(0.92); }
-
 .top-btn {
   bottom: 70px;
   background: #00c853;
@@ -190,7 +201,38 @@ button:active { transform: scale(0.92); }
 @media (max-width: 450px) { .gallery { column-count: 1; } }
 
 .hidden { display: none; }
-  </style>
+
+/* ---- Lightbox modal ---- */
+#lightboxModal {
+  display: none;
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.9);
+  justify-content:center;
+  align-items:center;
+  z-index: 9999;
+  overflow: hidden;
+}
+#lightboxModal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius:12px;
+  transition: transform 0.3s ease;
+}
+
+/* Arrows inside lightbox */
+#lightboxModal .arrow {
+  position: absolute;
+  top:50%;
+  font-size: 3rem;
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  transform: translateY(-50%);
+}
+#lightboxModal .arrow.left { left:20px; }
+#lightboxModal .arrow.right { right:20px; }
+</style>
 </head>
 
 <body>
@@ -216,12 +258,13 @@ button:active { transform: scale(0.92); }
 <div class="gallery" id="quotes"></div>
 
 <h2 class="hidden" id="hiddenTitle">🕶 Private Album</h2>
-<div class="gallery hidden" id="private">
-  <div class="item">
-    <img src="photos/private1.jpg">
-    <span class="watermark">𝓲𝓼𝓪𝓪𝓬 🅴</span>
-    <a class="download" href="photos/private1.jpg" download>⬇</a>
-  </div>
+<div class="gallery hidden" id="private"></div>
+
+<!-- Lightbox Modal -->
+<div id="lightboxModal" onclick="closeLightbox()">
+  <span class="arrow left" onclick="prevLightbox(event)">❮</span>
+  <img id="lightboxImg" src="">
+  <span class="arrow right" onclick="nextLightbox(event)">❯</span>
 </div>
 
 <script>
@@ -230,11 +273,12 @@ document.addEventListener("dragstart", e => e.preventDefault());
 
 const PUBLIC_COUNT = 67;
 const QUOTES_COUNT = 31;
-
 const music = document.getElementById("bgMusic");
-document.body.addEventListener("click", () => {
-  if (music.paused) music.play().catch(() => {});
-}, { once: true });
+let allImages = []; // for lightbox navigation
+let currentIndex = 0;
+
+// Play music once on body click
+document.body.addEventListener("click", () => { if (music.paused) music.play().catch(()=>{}); }, { once:true });
 
 function toggleMode() { document.body.classList.toggle("light"); }
 
@@ -243,113 +287,101 @@ function unlock() {
   if (pass === "6677") {
     document.getElementById("private").classList.remove("hidden");
     document.getElementById("hiddenTitle").classList.remove("hidden");
+    loadGallery("photos/private", 5, "private", "private"); // load private album
     alert("Unlocked 🔓");
-  } else {
-    alert("Sorry Bruhh ❌");
-  }
+  } else { alert("Sorry Bruhh ❌"); }
 }
 
-// Audio cues
-const sectionAudio = new Audio('sounds/section.mp3');
-const downloadAudio = new Audio('sounds/download.mp3');
+async function downloadZip() {
+  const zip = new JSZip();
+  const images = allImages.map(i=>i.src);
+  for (let img of images) {
+    const res = await fetch(img);
+    if (!res.ok) continue;
+    const blob = await res.blob();
+    zip.file(img.split("/").pop(), blob);
+  }
+  const content = await zip.generateAsync({ type: "blob" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(content);
+  a.download = "photos.zip";
+  a.click();
+}
 
-// Gallery loader
-function loadGallery(folder, count, prefix, targetId) {
+// Infinite scroll + staggered masonry
+function loadGallery(folder,count,prefix,targetId){
   const container = document.getElementById(targetId);
-  for (let i = 1; i <= count; i++) {
-    const div = document.createElement('div');
-    div.className = 'item';
+  let loadedCount = 0;
+  const batch = 12;
 
-    const img = document.createElement('img');
-    img.src = `${folder}/${prefix}${i}.jpg`;
-    img.loading = 'lazy';
-    img.onload = () => {
-      setTimeout(() => {
-        img.classList.add('loaded');
-      }, i*50);
-    };
-
-    const wm = document.createElement('span');
-    wm.className = 'watermark';
-    wm.textContent = '𝓲𝓼𝓪𝓪𝓬 🅴';
-
-    const dl = document.createElement('a');
-    dl.className = 'download';
-    dl.href = img.src;
-    dl.download = '';
-    dl.textContent = '⬇';
-
-    div.appendChild(img);
-    div.appendChild(wm);
-    div.appendChild(dl);
-    container.appendChild(div);
+  function loadBatch(){
+    const limit = Math.min(loadedCount+batch,count);
+    for(let i=loadedCount;i<limit;i++){
+      const div = document.createElement('div'); div.className='item';
+      const img = document.createElement('img');
+      img.src = `${folder}/${prefix}${i+1}.jpg`;
+      img.loading='lazy';
+      img.onload=()=>{setTimeout(()=>img.classList.add('loaded'), i*50);}
+      const wm=document.createElement('span'); wm.className='watermark'; wm.textContent='𝓲𝓼𝓪𝓪𝓬 🅴';
+      const dl=document.createElement('a'); dl.className='download'; dl.href=img.src; dl.download=''; dl.textContent='⬇';
+      div.appendChild(img); div.appendChild(wm); div.appendChild(dl);
+      div.addEventListener('click',()=>openLightbox(img.src));
+      container.appendChild(div);
+      allImages.push(img);
+    }
+    loadedCount = limit;
   }
+
+  loadBatch();
+
+  // Infinite scroll
+  window.addEventListener('scroll',()=>{
+    if(window.innerHeight + window.scrollY >= container.offsetTop + container.offsetHeight - 200){
+      if(loadedCount<count) loadBatch();
+    }
+  });
 }
 
-// Load galleries
+// Load main galleries
 loadGallery("photos", PUBLIC_COUNT, "photo", "public");
 loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
 
-function downloadZip() {
-  downloadAudio.currentTime = 0;
-  downloadAudio.play().catch(()=>{});
-
-  const zip = new JSZip();
-  const images = [];
-  for (let i = 1; i <= PUBLIC_COUNT; i++) images.push(`photos/photo${i}.jpg`);
-
-  images.forEach(async img => {
-    const res = await fetch(img);
-    if (!res.ok) return;
-    const blob = await res.blob();
-    zip.file(img.split("/")[1], blob);
+// fade-in sections
+const sections=document.querySelectorAll('.gallery');
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting) entry.target.classList.add('visible');
   });
+},{threshold:0.1});
+sections.forEach(sec=>observer.observe(sec));
 
-  zip.generateAsync({ type: "blob" }).then(content => {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(content);
-    a.download = "photos.zip";
-    a.click();
-  });
-}
-
-function goToQuotes() {
-  document.getElementById("quotesSection").scrollIntoView({ behavior: "smooth" });
-}
-
-const jumpBtn = document.querySelector(".jump-btn:not(.top-btn)");
-const quotesSection = document.getElementById("quotesSection");
-const topBtn = document.querySelector(".top-btn");
+// Jump buttons
+const jumpBtn=document.querySelector(".jump-btn:not(.top-btn)");
+const quotesSection=document.getElementById("quotesSection");
+const topBtn=document.querySelector(".top-btn");
 let scrollTimeout;
-
-window.addEventListener("scroll", () => {
+window.addEventListener("scroll",()=>{
   document.body.classList.add("hide-downloads");
   clearTimeout(scrollTimeout);
-  scrollTimeout = setTimeout(() => document.body.classList.remove("hide-downloads"), 250);
-
-  topBtn.style.display = window.scrollY > 500 ? "block" : "none";
-  const rect = quotesSection.getBoundingClientRect();
-  jumpBtn.style.display = rect.top < 100 ? "none" : "block";
+  scrollTimeout=setTimeout(()=>document.body.classList.remove("hide-downloads"),250);
+  topBtn.style.display=window.scrollY>500?"block":"none";
+  const rect=quotesSection.getBoundingClientRect();
+  jumpBtn.style.display=rect.top<100?"none":"block";
 });
+function goToTop(){ window.scrollTo({ top:0, behavior:"smooth" }); }
+function goToQuotes(){ quotesSection.scrollIntoView({ behavior:"smooth" }); }
 
-function goToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); }
-
-// Fade-in sections on scroll with audio
-function observeSections() {
-  const sections = document.querySelectorAll('.gallery');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting){
-        entry.target.classList.add('visible');
-        sectionAudio.currentTime = 0;
-        sectionAudio.play().catch(()=>{});
-      }
-    });
-  }, { threshold: 0.1 });
-  sections.forEach(sec => observer.observe(sec));
+// Lightbox functions
+function openLightbox(src){
+  const modal=document.getElementById('lightboxModal');
+  const img=document.getElementById('lightboxImg');
+  currentIndex=allImages.findIndex(i=>i.src===src);
+  img.src=src;
+  modal.style.display='flex';
 }
-observeSections();
-
+function closeLightbox(){ document.getElementById('lightboxModal').style.display='none'; }
+function prevLightbox(e){ e.stopPropagation(); currentIndex=(currentIndex-1+allImages.length)%allImages.length; document.getElementById('lightboxImg').src=allImages[currentIndex].src;}
+function nextLightbox(e){ e.stopPropagation(); currentIndex=(currentIndex+1)%allImages.length; document.getElementById('lightboxImg').src=allImages[currentIndex].src;}
 </script>
 
 </body>
