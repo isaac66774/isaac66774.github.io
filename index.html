@@ -70,7 +70,7 @@ button {
 
 button:active { transform:scale(.95); }
 
-/* ---- CLEAN GRID (NO GAPS) ---- */
+/* ---- CLEAN GRID ---- */
 .gallery {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
@@ -136,7 +136,7 @@ button:active { transform:scale(.95); }
 
 .lightbox.show { display:flex; }
 
-/* ---- Floating ---- */
+/* ---- Floating buttons ---- */
 .jump-btn {
   position:fixed;
   right:18px;
@@ -154,6 +154,23 @@ button:active { transform:scale(.95); }
   display:none;
 }
 
+/* ---- Music Toggle ---- */
+.music-btn {
+  position:fixed;
+  left:18px;
+  bottom:18px;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:#222;
+  color:#fff;
+  font-size:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+
 /* ---- Mobile ---- */
 @media(max-width:480px){
   .gallery {
@@ -167,8 +184,11 @@ button:active { transform:scale(.95); }
 
 <body>
 
-<button class="jump-btn" onclick="goToQuotes()">👀 Watch out</button>
-<button class="jump-btn top-btn" onclick="goToTop()">⬆ Top</button>
+<button class="jump-btn" onclick="goToQuotes()">👀</button>
+<button class="jump-btn top-btn" onclick="goToTop()">⬆</button>
+
+<!-- MUSIC BUTTON -->
+<button class="music-btn" id="musicBtn" onclick="toggleMusic()">🎵</button>
 
 <audio id="bgMusic" loop>
   <source src="music/bg.mp3" type="audio/mpeg">
@@ -202,7 +222,24 @@ const QUOTES_COUNT = 31;
 const BATCH = 12;
 
 const music = document.getElementById("bgMusic");
-document.body.addEventListener("click",()=>music.play().catch(()=>{}),{once:true});
+const musicBtn = document.getElementById("musicBtn");
+
+/* Auto play on first tap (mobile-safe) */
+document.body.addEventListener("click",()=>{
+  if(music.paused){
+    music.play().catch(()=>{});
+  }
+},{once:true});
+
+function toggleMusic(){
+  if(music.paused){
+    music.play();
+    musicBtn.textContent="🎵";
+  }else{
+    music.pause();
+    musicBtn.textContent="🔇";
+  }
+}
 
 function toggleMode(){document.body.classList.toggle("light");}
 
@@ -226,9 +263,6 @@ function loadGallery(folder,count,prefix,id){
 
       const img=document.createElement("img");
       img.src=`${folder}/${prefix}${loaded}.jpg`;
-      img.srcset=`
-        ${folder}/${prefix}${loaded}.jpg 800w
-      `;
       img.loading="lazy";
       img.onload=()=>img.classList.add("loaded");
       img.onclick=()=>openLightbox(img.src);
