@@ -1,332 +1,315 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Isaac's Skins Gallery</title>
+  <title>Isaac's Skins Gallery</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- ZIP library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-<meta name="theme-color" content="#111111">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#111111">
 
-<style>
-:root{
-  --bg:#111;
-  --text:#fff;
-  --card:#1e1e1e;
-  --accent:#ff4081;
-}
-
-body.light{
-  --bg:#f4f4f4;
-  --text:#000;
-  --card:#fff;
-}
-
-body{
-  margin:0;
-  padding:16px;
-  font-family:Arial, sans-serif;
-  background:var(--bg);
-  color:var(--text);
+  <style>
+/* ---- H2 Modern Style ---- */
+h2 {
+  font-size: clamp(28px, 4vw, 40px);
+  margin-top: 50px;
+  margin-bottom: 25px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  position: relative;
+  color: #ff4081;
+  text-transform: uppercase;
 }
 
-/* ---------- Titles ---------- */
-h1{text-align:center;margin:10px 0}
-h2{
-  margin:40px 0 14px;
-  color:var(--accent);
-  text-transform:uppercase;
-}
-h2::after{
-  content:"";
-  display:block;
-  width:50px;
-  height:4px;
-  background:linear-gradient(90deg,#ff4081,#ff80ab);
-  margin-top:6px;
-  border-radius:6px;
+h2::after {
+  content: "";
+  display: block;
+  width: 70px;
+  height: 4px;
+  background: linear-gradient(90deg, #ff4081, #ff80ab);
+  margin-top: 10px;
+  border-radius: 5px;
 }
 
-/* ---------- Top bar ---------- */
-.top-bar{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-  margin-bottom:16px;
-}
-button{
-  padding:10px 16px;
-  border:none;
-  border-radius:8px;
-  background:#007bff;
-  color:#fff;
+/* ---- Variables ---- */
+:root {
+  --bg: #111;
+  --text: #fff;
+  --card: #1e1e1e;
 }
 
-/* ---------- CLEAN GRID ---------- */
-.gallery{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-  opacity:0;
-  transform:translateY(20px);
-  transition:.5s;
-}
-.gallery.visible{
-  opacity:1;
-  transform:none;
+body.light {
+  --bg: #f4f4f4;
+  --text: #000;
+  --card: #fff;
 }
 
-/* ---------- Card ---------- */
-.item{
-  position:relative;
-  aspect-ratio:3/4;
-  background:var(--card);
-  border-radius:14px;
-  overflow:hidden;
+/* ---- Body ---- */
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: 0.3s;
 }
 
-/* Blur placeholder */
-.item::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:#333;
-  filter:blur(20px);
-  z-index:0;
+h1 { text-align: center; }
+
+/* ---- Top bar ---- */
+.top-bar {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-/* Image */
-.item img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  opacity:0;
-  transition:.4s;
-  position:relative;
-  z-index:1;
-}
-.item img.loaded{opacity:1}
-
-/* Watermark */
-.watermark{
-  position:absolute;
-  bottom:8px;
-  left:10px;
-  font-size:12px;
-  opacity:.6;
-  z-index:3;
+button {
+  padding: 12px 16px; /* bigger for touch */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  transition: transform 0.1s ease;
+  font-size: 16px;
 }
 
-/* Download */
-.download{
-  position:absolute;
-  bottom:10px;
-  right:10px;
-  background:rgba(0,0,0,.6);
-  padding:10px;
-  border-radius:50%;
-  color:#fff;
-  z-index:3;
+button:active { transform: scale(0.95); }
+
+/* ---- Gallery ---- */
+.gallery {
+  column-count: 4;
+  column-gap: 16px;
+  opacity: 1; /* always visible on mobile */
+  transform: translateY(0);
 }
 
-/* Favorite */
-.fav{
-  position:absolute;
-  top:10px;
-  right:10px;
-  font-size:18px;
-  z-index:3;
-}
-.fav.active{color:#ffd700}
-
-/* ---------- Floating buttons ---------- */
-.jump-btn{
-  position:fixed;
-  right:16px;
-  bottom:16px;
-  background:var(--accent);
-  padding:14px 18px;
-  border-radius:50px;
-  color:#fff;
-  border:none;
-  z-index:999;
-}
-.top-btn{
-  bottom:70px;
-  background:#00c853;
-  display:none;
+.item {
+  break-inside: avoid;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
 }
 
-/* ---------- Lightbox ---------- */
-#lightbox{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-#lightbox img{
-  max-width:100%;
-  max-height:100%;
-}
-#lightbox.close{
-  display:flex;
+/* Skeleton loader */
+.item img {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+  user-select: none;
+  pointer-events: none;
+
+  /* skeleton effect */
+  background: #333;
+  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-/* Like animation */
-.like{
-  position:absolute;
-  font-size:80px;
-  color:#ff4081;
-  opacity:0;
-  animation:like .8s ease forwards;
+.item img.loaded {
+  opacity: 1;
+  transform: translateY(0);
+  animation: none;
 }
-@keyframes like{
-  0%{transform:scale(.5);opacity:0}
-  50%{opacity:1}
-  100%{transform:scale(1.4);opacity:0}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
-</style>
+
+/* ---- Download icon ---- */
+.download {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 8px;
+  border-radius: 50%;
+  font-size: 16px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease, opacity 0.3s;
+}
+
+/* ---- Watermark ---- */
+.watermark {
+  position: absolute;
+  bottom: 6px;
+  left: 8px;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* ---- Jump buttons ---- */
+.jump-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 14px 18px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  background: #ff4081;
+  color: white;
+  font-size: 16px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  z-index: 999;
+  transition: transform 0.1s ease;
+}
+
+.jump-btn:active { transform: scale(0.92); }
+
+.top-btn {
+  bottom: 70px;
+  background: #00c853;
+  display: none;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1000px) { .gallery { column-count: 3; } }
+@media (max-width: 700px) { .gallery { column-count: 2; } }
+@media (max-width: 450px) { .gallery { column-count: 1; } }
+
+.hidden { display: none; }
+  </style>
 </head>
 
 <body>
-
-<button class="jump-btn" onclick="goToQuotes()">👀</button>
-<button class="jump-btn top-btn" onclick="goTop()">⬆</button>
+<button class="jump-btn" onclick="goToQuotes()">👀 Watch out</button>
+<button class="jump-btn top-btn" onclick="goToTop()">⬆ Top</button>
 
 <audio id="bgMusic" loop>
   <source src="music/bg.mp3" type="audio/mpeg">
 </audio>
 
-<h1>liviiii.fr 🍂</h1>
+<h1> liviiii.fr 🍂</h1>
 
 <div class="top-bar">
-  <button onclick="toggleMode()">🌓</button>
-  <button onclick="downloadZip()">📦</button>
+  <button onclick="toggleMode()">🌓 Dark / Light</button>
+  <button onclick="downloadZip()">📦 Download All (ZIP)</button>
+  <button onclick="unlock()">🔐 Hidden Gallery</button>
 </div>
 
-<h2>Skins</h2>
+<h2>🔥 Skins Hand Picked</h2>
 <div class="gallery" id="public"></div>
 
-<h2 id="quotesSection">Quotes</h2>
+<h2 id="quotesSection">💬 Quotes MMD</h2>
 <div class="gallery" id="quotes"></div>
 
-<!-- Lightbox -->
-<div id="lightbox" onclick="closeLightbox()">
-  <img id="lightImg">
+<h2 class="hidden" id="hiddenTitle">🕶 Private Album</h2>
+<div class="gallery hidden" id="private">
+  <div class="item">
+    <img src="photos/private1.jpg">
+    <span class="watermark">𝓲𝓼𝓪𝓪𝓬 🅴</span>
+    <a class="download" href="photos/private1.jpg" download>⬇</a>
+  </div>
 </div>
 
 <script>
-document.body.addEventListener("click",()=>{
-  const m=document.getElementById("bgMusic");
-  if(m.paused)m.play().catch(()=>{})
-},{once:true});
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
 
-const PUBLIC_COUNT=20;
-const QUOTES_COUNT=10;
+const PUBLIC_COUNT = 67;
+const QUOTES_COUNT = 31;
 
-const favs=JSON.parse(localStorage.getItem("favs")||"[]");
+const music = document.getElementById("bgMusic");
+document.body.addEventListener("click", () => {
+  if (music.paused) music.play().catch(() => {});
+}, { once: true });
 
-function loadGallery(folder,count,prefix,id){
-  const g=document.getElementById(id);
-  for(let i=1;i<=count;i++){
-    const d=document.createElement("div");
-    d.className="item";
+function toggleMode() { document.body.classList.toggle("light"); }
 
-    const img=document.createElement("img");
-    img.src=`${folder}/${prefix}${i}.jpg`;
-    img.loading="lazy";
-    img.onload=()=>img.classList.add("loaded");
-    img.onclick=()=>openLightbox(img.src);
-
-    let tap=0;
-    img.addEventListener("touchend",e=>{
-      tap++;
-      if(tap===2){
-        showLike(e);
-        tap=0;
-      }
-      setTimeout(()=>tap=0,300);
-    });
-
-    const fav=document.createElement("div");
-    fav.className="fav";
-    fav.textContent="⭐";
-    if(favs.includes(img.src))fav.classList.add("active");
-    fav.onclick=e=>{
-      e.stopPropagation();
-      fav.classList.toggle("active");
-      toggleFav(img.src);
-    };
-
-    const dl=document.createElement("a");
-    dl.className="download";
-    dl.textContent="⬇";
-    dl.href=img.src;
-    dl.download="";
-
-    const wm=document.createElement("span");
-    wm.className="watermark";
-    wm.textContent="𝓲𝓼𝓪𝓪𝓬 🅴";
-
-    d.append(img,fav,dl,wm);
-    g.appendChild(d);
+function unlock() {
+  const pass = prompt("Enter password:");
+  if (pass === "6677") {
+    document.getElementById("private").classList.remove("hidden");
+    document.getElementById("hiddenTitle").classList.remove("hidden");
+    alert("Unlocked 🔓");
+  } else {
+    alert("Sorry Bruhh ❌");
   }
 }
 
-loadGallery("photos",PUBLIC_COUNT,"photo","public");
-loadGallery("quotes",QUOTES_COUNT,"quote","quotes");
+async function downloadZip() {
+  const zip = new JSZip();
+  const images = [];
+  for (let i = 1; i <= PUBLIC_COUNT; i++) images.push(`photos/photo${i}.jpg`);
 
-/* Favorites */
-function toggleFav(src){
-  const i=favs.indexOf(src);
-  if(i>-1)favs.splice(i,1);
-  else favs.push(src);
-  localStorage.setItem("favs",JSON.stringify(favs));
-}
+  for (let img of images) {
+    const res = await fetch(img);
+    if (!res.ok) continue;
+    const blob = await res.blob();
+    zip.file(img.split("/")[1], blob);
+  }
 
-/* Lightbox */
-function openLightbox(src){
-  const l=document.getElementById("lightbox");
-  document.getElementById("lightImg").src=src;
-  l.style.display="flex";
-}
-function closeLightbox(){
-  document.getElementById("lightbox").style.display="none";
+  const content = await zip.generateAsync({ type: "blob" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(content);
+  a.download = "photos.zip";
+  a.click();
 }
 
-/* Like animation */
-function showLike(e){
-  const h=document.createElement("div");
-  h.className="like";
-  h.textContent="❤️";
-  h.style.left=e.changedTouches[0].clientX+"px";
-  h.style.top=e.changedTouches[0].clientY+"px";
-  document.body.appendChild(h);
-  setTimeout(()=>h.remove(),800);
+function loadGallery(folder, count, prefix, targetId) {
+  const container = document.getElementById(targetId);
+  for (let i = 1; i <= count; i++) {
+    const div = document.createElement('div');
+    div.className = 'item';
+
+    const img = document.createElement('img');
+    img.src = `${folder}/${prefix}${i}.jpg`;
+    img.loading = 'lazy';
+    img.onload = () => setTimeout(() => img.classList.add('loaded'), i*50);
+
+    const wm = document.createElement('span');
+    wm.className = 'watermark';
+    wm.textContent = '𝓲𝓼𝓪𝓪𝓬 🅴';
+
+    const dl = document.createElement('a');
+    dl.className = 'download';
+    dl.href = img.src;
+    dl.download = '';
+    dl.textContent = '⬇';
+
+    div.appendChild(img);
+    div.appendChild(wm);
+    div.appendChild(dl);
+    container.appendChild(div);
+  }
 }
 
-/* Scroll helpers */
-function goToQuotes(){
-  document.getElementById("quotesSection").scrollIntoView({behavior:"smooth"});
-}
-function goTop(){
-  window.scrollTo({top:0,behavior:"smooth"});
+// Load galleries
+loadGallery("photos", PUBLIC_COUNT, "photo", "public");
+loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
+
+function goToQuotes() {
+  document.getElementById("quotesSection").scrollIntoView({ behavior: "smooth" });
 }
 
-window.addEventListener("scroll",()=>{
-  document.querySelector(".top-btn").style.display=window.scrollY>400?"block":"none";
+const jumpBtn = document.querySelector(".jump-btn:not(.top-btn)");
+const quotesSection = document.getElementById("quotesSection");
+const topBtn = document.querySelector(".top-btn");
+let scrollTimeout;
+
+window.addEventListener("scroll", () => {
+  document.body.classList.add("hide-downloads");
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(() => document.body.classList.remove("hide-downloads"), 250);
+
+  topBtn.style.display = window.scrollY > 500 ? "block" : "none";
+  const rect = quotesSection.getBoundingClientRect();
+  jumpBtn.style.display = rect.top < 100 ? "none" : "block";
 });
 
-/* Fade-in */
-const obs=new IntersectionObserver(e=>{
-  e.forEach(x=>x.isIntersecting&&x.target.classList.add("visible"));
-});
-document.querySelectorAll(".gallery").forEach(g=>obs.observe(g));
+function goToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); }
 </script>
 
 </body>
