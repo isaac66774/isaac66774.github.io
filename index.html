@@ -108,7 +108,6 @@ button:active { transform: scale(0.92); }
   user-select: none;
   pointer-events: none;
 
-  /* skeleton effect */
   background: #333;
   background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
   background-size: 200% 100%;
@@ -125,7 +124,6 @@ button:active { transform: scale(0.92); }
   animation: none;
 }
 
-/* Shimmer animation */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -222,7 +220,7 @@ button:active { transform: scale(0.92); }
   <div class="item">
     <img src="photos/private1.jpg">
     <span class="watermark">𝓲𝓼𝓪𝓪𝓬 🅴</span>
-    <a class="download" href="photos/private1.jpg" download>🡇</a>
+    <a class="download" href="photos/private1.jpg" download>⬇</a>
   </div>
 </div>
 
@@ -251,25 +249,11 @@ function unlock() {
   }
 }
 
-async function downloadZip() {
-  const zip = new JSZip();
-  const images = [];
-  for (let i = 1; i <= PUBLIC_COUNT; i++) images.push(`photos/photo${i}.jpg`);
+// Audio cues
+const sectionAudio = new Audio('sounds/section.mp3');
+const downloadAudio = new Audio('sounds/download.mp3');
 
-  for (let img of images) {
-    const res = await fetch(img);
-    if (!res.ok) continue;
-    const blob = await res.blob();
-    zip.file(img.split("/")[1], blob);
-  }
-
-  const content = await zip.generateAsync({ type: "blob" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(content);
-  a.download = "photos.zip";
-  a.click();
-}
-
+// Gallery loader
 function loadGallery(folder, count, prefix, targetId) {
   const container = document.getElementById(targetId);
   for (let i = 1; i <= count; i++) {
@@ -279,7 +263,11 @@ function loadGallery(folder, count, prefix, targetId) {
     const img = document.createElement('img');
     img.src = `${folder}/${prefix}${i}.jpg`;
     img.loading = 'lazy';
-    img.onload = () => setTimeout(() => img.classList.add('loaded'), i*50);
+    img.onload = () => {
+      setTimeout(() => {
+        img.classList.add('loaded');
+      }, i*50);
+    };
 
     const wm = document.createElement('span');
     wm.className = 'watermark';
@@ -289,7 +277,7 @@ function loadGallery(folder, count, prefix, targetId) {
     dl.className = 'download';
     dl.href = img.src;
     dl.download = '';
-    dl.textContent = '🡇';
+    dl.textContent = '⬇';
 
     div.appendChild(img);
     div.appendChild(wm);
@@ -298,13 +286,31 @@ function loadGallery(folder, count, prefix, targetId) {
   }
 }
 
-// load galleries
+// Load galleries
 loadGallery("photos", PUBLIC_COUNT, "photo", "public");
 loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
 
-function toggleMusic() {
-  if (music.paused) music.play();
-  else music.pause();
+function downloadZip() {
+  downloadAudio.currentTime = 0;
+  downloadAudio.play().catch(()=>{});
+
+  const zip = new JSZip();
+  const images = [];
+  for (let i = 1; i <= PUBLIC_COUNT; i++) images.push(`photos/photo${i}.jpg`);
+
+  images.forEach(async img => {
+    const res = await fetch(img);
+    if (!res.ok) return;
+    const blob = await res.blob();
+    zip.file(img.split("/")[1], blob);
+  });
+
+  zip.generateAsync({ type: "blob" }).then(content => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(content);
+    a.download = "photos.zip";
+    a.click();
+  });
 }
 
 function goToQuotes() {
@@ -328,17 +334,22 @@ window.addEventListener("scroll", () => {
 
 function goToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); }
 
-// fade-in sections on scroll
+// Fade-in sections on scroll with audio
 function observeSections() {
   const sections = document.querySelectorAll('.gallery');
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      if(entry.isIntersecting) entry.target.classList.add('visible');
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+        sectionAudio.currentTime = 0;
+        sectionAudio.play().catch(()=>{});
+      }
     });
   }, { threshold: 0.1 });
   sections.forEach(sec => observer.observe(sec));
 }
 observeSections();
+
 </script>
 
 </body>
