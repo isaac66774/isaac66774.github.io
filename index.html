@@ -1,27 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Isaac's Skins Gallery</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
 
   <!-- ZIP library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#111111">
-
   <style>
-/* ---- H2 Modern Style ---- */
+/* ---- Root & Body ---- */
+:root {
+  --bg: #111;
+  --text: #fff;
+  --card: #1e1e1e;
+}
+
+body.light {
+  --bg: #f4f4f4;
+  --text: #000;
+  --card: #fff;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: 0.3s;
+}
+
+/* ---- Headings ---- */
+h1 { text-align: center; }
 h2 {
   font-size: clamp(28px, 4vw, 40px);
-  margin-top: 50px;
-  margin-bottom: 25px;
+  margin-top: 40px;
+  margin-bottom: 20px;
   font-weight: 800;
   letter-spacing: 1px;
-  position: relative;
   color: #ff4081;
   text-transform: uppercase;
 }
-
 h2::after {
   content: "";
   display: block;
@@ -32,146 +54,87 @@ h2::after {
   border-radius: 5px;
 }
 
-/* ---- Variables ---- */
-:root {
-  --bg: #111;
-  --text: #fff;
-  --card: #1e1e1e;
-  --accent1: #ff4081;
-  --accent2: #ff80ab;
-}
-
-/* Background gradient animation */
-body {
-  margin: 0;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(120deg, #111, #1a1a1a);
-  background-size: 400% 400%;
-  animation: bgAnimate 30s ease infinite;
-  color: var(--text);
-  transition: 0.3s;
-}
-@keyframes bgAnimate {
-  0% {background-position:0% 50%}
-  50% {background-position:100% 50%}
-  100% {background-position:0% 50%}
-}
-
-body.light {
-  --bg: #f4f4f4;
-  --text: #000;
-  --card: #fff;
-}
-
-h1 { text-align: center; }
-
-/* ---- Top bar ---- */
+/* ---- Top Bar ---- */
 .top-bar {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin-bottom: 20px;
   flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 button {
-  padding: 8px 14px;
+  padding: 12px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   background: #007bff;
   color: white;
+  font-size: 16px;
   transition: transform 0.1s ease;
 }
-button:active { transform: scale(0.92); }
+button:active { transform: scale(0.95); }
 
-/* ---- Gallery ---- */
+/* ---- Gallery Grid ---- */
 .gallery {
-  column-count: 4;
-  column-gap: 18px;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
 }
-
-.gallery.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 .item {
-  break-inside: avoid;
-  margin-bottom: 18px;
   position: relative;
   overflow: hidden;
   border-radius: 12px;
-  cursor: pointer;
-  perspective: 1000px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: var(--card);
+  transition: transform 0.3s ease;
 }
-
-.item:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 12px 20px rgba(0,0,0,0.5);
-}
-
-/* Skeleton loader */
 .item img {
   width: 100%;
   display: block;
   border-radius: 12px;
-  user-select: none;
   pointer-events: none;
+  user-select: none;
 
+  /* Skeleton shimmer */
   background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 .item img.loaded {
   opacity: 1;
   transform: translateY(0);
   animation: none;
 }
-
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
-/* ---- Download icon ---- */
+/* ---- Download & Watermark ---- */
 .download {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
+  bottom: 8px;
+  right: 8px;
   background: rgba(0,0,0,0.6);
   color: #fff;
-  padding: 10px;
+  padding: 8px;
   border-radius: 50%;
-  font-size: 18px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.4);
-  transition: transform 0.2s ease, opacity 0.3s;
+  font-size: 16px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
-.hide-downloads .download {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.8);
-}
-
-/* ---- Watermark ---- */
 .watermark {
   position: absolute;
-  bottom: 8px;
-  left: 10px;
-  font-size: 12px;
+  bottom: 6px;
+  left: 8px;
+  font-size: 11px;
   opacity: 0.6;
 }
 
-/* ---- Jump buttons ---- */
+/* ---- Jump Buttons ---- */
 .jump-btn {
   position: fixed;
   bottom: 20px;
@@ -180,62 +143,40 @@ button:active { transform: scale(0.92); }
   border-radius: 50px;
   border: none;
   cursor: pointer;
-  background: var(--accent1);
+  background: #ff4081;
   color: white;
   font-size: 16px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  backdrop-filter: blur(6px);
   z-index: 999;
-  transition: transform 0.1s ease;
 }
-.jump-btn:active { transform: scale(0.92); }
 .top-btn {
   bottom: 70px;
   background: #00c853;
   display: none;
 }
 
-/* ---- Responsive ---- */
-@media (max-width: 1000px) { .gallery { column-count: 3; } }
-@media (max-width: 700px) { .gallery { column-count: 2; } }
-@media (max-width: 450px) { .gallery { column-count: 1; } }
-
-.hidden { display: none; }
-
-/* ---- Lightbox modal ---- */
-#lightboxModal {
-  display: none;
+/* ---- Lightbox ---- */
+#lightbox {
   position: fixed;
-  top:0; left:0; width:100%; height:100%;
-  background: rgba(0,0,0,0.9);
-  justify-content:center;
-  align-items:center;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.95);
+  display: none;
+  justify-content: center;
+  align-items: center;
   z-index: 9999;
-  overflow: hidden;
 }
-#lightboxModal img {
-  max-width: 90%;
-  max-height: 90%;
-  border-radius:12px;
-  transition: transform 0.3s ease;
+#lightbox img {
+  max-width: 95%;
+  max-height: 95%;
+  border-radius: 12px;
 }
 
-/* Arrows inside lightbox */
-#lightboxModal .arrow {
-  position: absolute;
-  top:50%;
-  font-size: 3rem;
-  color: white;
-  cursor: pointer;
-  user-select: none;
-  transform: translateY(-50%);
-}
-#lightboxModal .arrow.left { left:20px; }
-#lightboxModal .arrow.right { right:20px; }
-</style>
+/* ---- Responsive ---- */
+@media (max-width: 700px) { .gallery { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); } }
+@media (max-width: 450px) { .gallery { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); } }
+  </style>
 </head>
-
 <body>
+
 <button class="jump-btn" onclick="goToQuotes()">👀 Watch out</button>
 <button class="jump-btn top-btn" onclick="goToTop()">⬆ Top</button>
 
@@ -260,11 +201,9 @@ button:active { transform: scale(0.92); }
 <h2 class="hidden" id="hiddenTitle">🕶 Private Album</h2>
 <div class="gallery hidden" id="private"></div>
 
-<!-- Lightbox Modal -->
-<div id="lightboxModal" onclick="closeLightbox()">
-  <span class="arrow left" onclick="prevLightbox(event)">❮</span>
-  <img id="lightboxImg" src="">
-  <span class="arrow right" onclick="nextLightbox(event)">❯</span>
+<!-- Lightbox -->
+<div id="lightbox" onclick="closeLightbox()">
+  <img src="">
 </div>
 
 <script>
@@ -274,32 +213,38 @@ document.addEventListener("dragstart", e => e.preventDefault());
 const PUBLIC_COUNT = 67;
 const QUOTES_COUNT = 31;
 const music = document.getElementById("bgMusic");
-let allImages = []; // for lightbox navigation
-let currentIndex = 0;
 
-// Play music once on body click
-document.body.addEventListener("click", () => { if (music.paused) music.play().catch(()=>{}); }, { once:true });
+// Play music only on first tap
+document.body.addEventListener("click", () => {
+  if (music.paused) music.play().catch(() => {});
+}, { once: true });
 
+// Dark mode
 function toggleMode() { document.body.classList.toggle("light"); }
 
+// Unlock private gallery
 function unlock() {
   const pass = prompt("Enter password:");
   if (pass === "6677") {
     document.getElementById("private").classList.remove("hidden");
     document.getElementById("hiddenTitle").classList.remove("hidden");
-    loadGallery("photos/private", 5, "private", "private"); // load private album
     alert("Unlocked 🔓");
-  } else { alert("Sorry Bruhh ❌"); }
+  } else {
+    alert("Sorry Bruhh ❌");
+  }
 }
 
+// Download ZIP
 async function downloadZip() {
   const zip = new JSZip();
-  const images = allImages.map(i=>i.src);
+  const images = [];
+  for (let i=1;i<=PUBLIC_COUNT;i++) images.push(`photos/photo${i}.jpg`);
+
   for (let img of images) {
     const res = await fetch(img);
     if (!res.ok) continue;
     const blob = await res.blob();
-    zip.file(img.split("/").pop(), blob);
+    zip.file(img.split("/")[1], blob);
   }
   const content = await zip.generateAsync({ type: "blob" });
   const a = document.createElement("a");
@@ -308,80 +253,55 @@ async function downloadZip() {
   a.click();
 }
 
-// Infinite scroll + staggered masonry
+// Load gallery with lazy load
 function loadGallery(folder,count,prefix,targetId){
-  const container = document.getElementById(targetId);
-  let loadedCount = 0;
-  const batch = 12;
+  const container=document.getElementById(targetId);
+  for(let i=1;i<=count;i++){
+    const div=document.createElement('div'); div.className='item';
+    const img=document.createElement('img');
+    img.src=`${folder}/${prefix}${i}.jpg`;
+    img.loading='lazy';
+    img.onload=()=>setTimeout(()=>img.classList.add('loaded'),i*50);
 
-  function loadBatch(){
-    const limit = Math.min(loadedCount+batch,count);
-    for(let i=loadedCount;i<limit;i++){
-      const div = document.createElement('div'); div.className='item';
-      const img = document.createElement('img');
-      img.src = `${folder}/${prefix}${i+1}.jpg`;
-      img.loading='lazy';
-      img.onload=()=>{setTimeout(()=>img.classList.add('loaded'), i*50);}
-      const wm=document.createElement('span'); wm.className='watermark'; wm.textContent='𝓲𝓼𝓪𝓪𝓬 🅴';
-      const dl=document.createElement('a'); dl.className='download'; dl.href=img.src; dl.download=''; dl.textContent='⬇';
-      div.appendChild(img); div.appendChild(wm); div.appendChild(dl);
-      div.addEventListener('click',()=>openLightbox(img.src));
-      container.appendChild(div);
-      allImages.push(img);
-    }
-    loadedCount = limit;
+    // Lightbox click
+    img.addEventListener('click',()=>openLightbox(img.src));
+
+    const wm=document.createElement('span'); wm.className='watermark'; wm.textContent='𝓲𝓼𝓪𝓪𝓬 🅴';
+    const dl=document.createElement('a'); dl.className='download'; dl.href=img.src; dl.download=''; dl.textContent='⬇';
+
+    div.appendChild(img); div.appendChild(wm); div.appendChild(dl);
+    container.appendChild(div);
   }
-
-  loadBatch();
-
-  // Infinite scroll
-  window.addEventListener('scroll',()=>{
-    if(window.innerHeight + window.scrollY >= container.offsetTop + container.offsetHeight - 200){
-      if(loadedCount<count) loadBatch();
-    }
-  });
 }
 
-// Load main galleries
+// Load galleries
 loadGallery("photos", PUBLIC_COUNT, "photo", "public");
 loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
 
-// fade-in sections
-const sections=document.querySelectorAll('.gallery');
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting) entry.target.classList.add('visible');
-  });
-},{threshold:0.1});
-sections.forEach(sec=>observer.observe(sec));
+// Jump to Quotes
+function goToQuotes(){ document.getElementById("quotesSection").scrollIntoView({behavior:'smooth'}); }
+function goToTop(){ window.scrollTo({top:0,behavior:'smooth'}); }
 
-// Jump buttons
+// Top buttons visibility
 const jumpBtn=document.querySelector(".jump-btn:not(.top-btn)");
 const quotesSection=document.getElementById("quotesSection");
 const topBtn=document.querySelector(".top-btn");
 let scrollTimeout;
 window.addEventListener("scroll",()=>{
-  document.body.classList.add("hide-downloads");
   clearTimeout(scrollTimeout);
-  scrollTimeout=setTimeout(()=>document.body.classList.remove("hide-downloads"),250);
-  topBtn.style.display=window.scrollY>500?"block":"none";
-  const rect=quotesSection.getBoundingClientRect();
-  jumpBtn.style.display=rect.top<100?"none":"block";
+  scrollTimeout=setTimeout(()=>{
+    topBtn.style.display=(window.scrollY>500)?'block':'none';
+    const rect=quotesSection.getBoundingClientRect();
+    jumpBtn.style.display=(rect.top<100)?'none':'block';
+  },100);
 });
-function goToTop(){ window.scrollTo({ top:0, behavior:"smooth" }); }
-function goToQuotes(){ quotesSection.scrollIntoView({ behavior:"smooth" }); }
 
 // Lightbox functions
-function openLightbox(src){
-  const modal=document.getElementById('lightboxModal');
-  const img=document.getElementById('lightboxImg');
-  currentIndex=allImages.findIndex(i=>i.src===src);
-  img.src=src;
-  modal.style.display='flex';
-}
-function closeLightbox(){ document.getElementById('lightboxModal').style.display='none'; }
-function prevLightbox(e){ e.stopPropagation(); currentIndex=(currentIndex-1+allImages.length)%allImages.length; document.getElementById('lightboxImg').src=allImages[currentIndex].src;}
-function nextLightbox(e){ e.stopPropagation(); currentIndex=(currentIndex+1)%allImages.length; document.getElementById('lightboxImg').src=allImages[currentIndex].src;}
+const lightbox=document.getElementById('lightbox');
+const lbImg=lightbox.querySelector('img');
+function openLightbox(src){ lbImg.src=src; lightbox.style.display='flex'; }
+function closeLightbox(){ lightbox.style.display='none'; lbImg.src=''; }
+
 </script>
 
 </body>
