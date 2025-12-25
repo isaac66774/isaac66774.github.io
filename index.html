@@ -102,12 +102,34 @@
     @media (max-width: 450px) { .gallery { column-count: 1; } }
 
     .hidden { display: none; }
+
+.jump-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 14px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  background: #ff4081;
+  color: white;
+  font-size: 14px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  z-index: 999;
+}
+
   </style>
 </head>
 
 <body>
 
-<h1>😜 Skins Freak</h1>
+<button class="jump-btn" onclick="goToQuotes()">👀 Watch out</button>
+
+<audio id="bgMusic" loop>
+  <source src="music/bg.mp3" type="audio/mpeg">
+</audio>
+
+<h1> liviiii.fr 🍂</h1>
 
 <div class="top-bar">
   <button onclick="toggleMode()">🌓 Dark / Light</button>
@@ -115,219 +137,13 @@
   <button onclick="unlock()">🔐 Hidden Gallery</button>
 </div>
 
-<h2>🔥 Public</h2>
+<h2>🔥 Skins Hand Picked</h2>
 
-<div class="gallery" id="public">
-  <div class="item">
-    <img src="photos/photo1.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo1.jpg" download>⬇</a>
-  </div>
+<div class="gallery" id="public"></div>
 
-  <div class="item">
-    <img src="photos/photo2.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo2.jpg" download>⬇</a>
-  </div>
+<h2 id="quotesSection">💬  Quotes MMD</h2>
 
-  <div class="item">
-    <img src="photos/photo3.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo3.jpg" download>⬇</a>
-  </div>
- 
-  <div class="item">
-    <img src="photos/photo4.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo4.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo5.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo5.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo6.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo6.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo7.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo7.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo8.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo8.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo9.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo9.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo10.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo10.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo11.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo11.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo12.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo12.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo13.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo13.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo14.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo14.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo15.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo15.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo16.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo16.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo17.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo17.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo18.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo18.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo19.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo19.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo20.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo20.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo21.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo21.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo22.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo22.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo23.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo23.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo24.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo24.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo25.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo25.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo26.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo26.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo27.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo27.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo28.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo28.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo29.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo29.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo30.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo30.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo31.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo31.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo32.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo32.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo33.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo33.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo34.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo34.jpg" download>⬇</a>
-  </div>
-
-  <div class="item">
-    <img src="photos/photo35.jpg">
-    <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/photo35.jpg" download>⬇</a>
-  </div>
-</div>
+<div class="gallery" id="quotes"></div>
 
 <h2 class="hidden" id="hiddenTitle">🕶 Private Album</h2>
 
@@ -335,11 +151,22 @@
   <div class="item">
     <img src="photos/private1.jpg">
     <span class="watermark">𝓘𝓔</span>
-    <a class="download" href="photos/private1.jpg" download>⬇</a>
+    <a class="download" href="photos/private1.jpg" download>🢃</a>
   </div>
 </div>
 
 <script>
+  const PUBLIC_COUNT = 67;
+  const QUOTES_COUNT = 31;
+
+  const music = document.getElementById("bgMusic");
+
+  document.body.addEventListener("click", () => {
+    if (music.paused) {
+      music.play().catch(() => {});
+    }
+  }, { once: true });
+
   function toggleMode() {
     document.body.classList.toggle("light");
   }
@@ -351,31 +178,65 @@
       document.getElementById("hiddenTitle").classList.remove("hidden");
       alert("Unlocked 🔓");
     } else {
-      alert("Wrong password ❌");
+      alert("Sorry Bruhh ❌");
     }
   }
 
   async function downloadZip() {
-    const zip = new JSZip();
-    const images = [];
-    for (let i = 1; i <= 35; i++) {
-      images.push(`photos/photo${i}.jpg`);
-    }
+  const zip = new JSZip();
+  const images = [];
 
-
-    for (let img of images) {
-      const response = await fetch(img);
-      const blob = await response.blob();
-      zip.file(img.split("/")[1], blob);
-    }
-
-    zip.generateAsync({ type: "blob" }).then(content => {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(content);
-      a.download = "photos.zip";
-      a.click();
-    });
+  for (let i = 1; i <= PUBLIC_COUNT; i++) {
+    images.push(`photos/photo${i}.jpg`);
   }
+
+  for (let img of images) {
+    const response = await fetch(img);
+    if (!response.ok) continue; 
+
+    const blob = await response.blob();
+    zip.file(img.split("/")[1], blob);
+  }
+
+  const content = await zip.generateAsync({ type: "blob" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(content);
+  a.download = "photos.zip";
+  a.click();
+}
+
+function loadGallery(folder, count, prefix, targetId) {
+  const container = document.getElementById(targetId);
+
+  for (let i = 1; i <= count; i++) {
+    container.innerHTML += `
+      <div class="item">
+        <img src="${folder}/${prefix}${i}.jpg"
+             loading="lazy"
+             onerror="this.parentElement.remove()">
+        <span class="watermark">🄴 𝓲𝓼𝓪𝓪𝓬</span>
+        <a class="download" href="${folder}/${prefix}${i}.jpg" download>🢃</a>
+      </div>
+    `;
+  }
+}
+
+ loadGallery("photos", PUBLIC_COUNT, "photo", "public");
+ loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
+ 
+ function goToQuotes() {
+  document.getElementById("quotesSection")
+    .scrollIntoView({ behavior: "smooth" });
+}
+
+ const jumpBtn = document.querySelector(".jump-btn");
+ const quotesSection = document.getElementById("quotesSection");
+
+ window.addEventListener("scroll", () => {
+  const rect = quotesSection.getBoundingClientRect();
+  jumpBtn.style.display = rect.top < window.innerHeight ? "none" : "block";
+ });
+
 </script>
 
 </body>
