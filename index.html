@@ -217,7 +217,7 @@ button:active { transform: scale(0.92); }
 <body>
 <button class="jump-btn" onclick="goToQuotes()">👀 Watch out</button>
 <button class="jump-btn top-btn" onclick="goToTop()">⬆ Top</button>
-<button class="music-toggle" onclick="toggleMusic()">🎵 Play / Pause</button>
+<button class="music-toggle" id="musicBtn" onclick="toggleMusic()">🔇</button>
 
 <audio id="bgMusic" loop>
   <source src="music/bg.mp3" type="audio/mpeg">
@@ -242,7 +242,7 @@ button:active { transform: scale(0.92); }
   <div class="item">
     <img src="photos/private1.jpg">
     <span class="watermark">𝓲𝓼𝓪𝓪𝓬 🅴</span>
-    <a class="download" href="photos/private1.jpg" download>🡇</a>
+    <a class="download" href="photos/private1.jpg" download>⬇</a>
   </div>
 </div>
 
@@ -254,8 +254,12 @@ const PUBLIC_COUNT = 67;
 const QUOTES_COUNT = 31;
 
 const music = document.getElementById("bgMusic");
+const musicBtn = document.getElementById("musicBtn");
 document.body.addEventListener("click", () => {
-  if (music.paused) music.play().catch(() => {});
+  if (music.paused) {
+    music.play().catch(() => {});
+    musicBtn.textContent = "🎵";
+  }
 }, { once: true });
 
 function toggleMode() { document.body.classList.toggle("light"); }
@@ -309,7 +313,7 @@ function loadGallery(folder, count, prefix, targetId) {
     dl.className = 'download';
     dl.href = img.src;
     dl.download = '';
-    dl.textContent = '🡇';
+    dl.textContent = '⬇';
 
     div.appendChild(img);
     div.appendChild(wm);
@@ -323,8 +327,13 @@ loadGallery("photos", PUBLIC_COUNT, "photo", "public");
 loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
 
 function toggleMusic() {
-  if (music.paused) music.play();
-  else music.pause();
+  if (music.paused) {
+    music.play();
+    musicBtn.textContent = "🎵";
+  } else {
+    music.pause();
+    musicBtn.textContent = "🔇";
+  }
 }
 
 function goToQuotes() {
@@ -359,6 +368,20 @@ function observeSections() {
   sections.forEach(sec => observer.observe(sec));
 }
 observeSections();
+
+function pauseMusicSafely() {
+  if (!music.paused) {
+    music.pause();
+    musicBtn.textContent = "🔇";
+  }
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) pauseMusicSafely();
+});
+
+window.addEventListener("blur", pauseMusicSafely);
+
 </script>
 
 </body>
