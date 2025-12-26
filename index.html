@@ -1,205 +1,234 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <title>Isaac's Skins Gallery</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111111">
-
+  <!-- ZIP library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-<style>
-:root {
-  --bg:#111;
-  --text:#fff;
-  --card:#1e1e1e;
-  --accent:#ff4081;
-}
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#111111">
 
-body.light {
-  --bg:#f4f4f4;
-  --text:#000;
-  --card:#fff;
-}
-
-body {
-  margin:0;
-  padding:18px;
-  font-family:Arial, sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-
-h1 { text-align:center; }
-
-/* ---- Titles ---- */
+  <style>
+/* ---- H2 Modern Style ---- */
 h2 {
-  font-size:clamp(24px,4vw,34px);
-  margin:45px 0 18px;
-  font-weight:800;
-  color:var(--accent);
+  font-size: clamp(28px, 4vw, 40px);
+  margin-top: 50px;
+  margin-bottom: 25px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  position: relative;
+  color: #ff4081;
+  text-transform: uppercase;
 }
 
 h2::after {
-  content:"";
-  display:block;
-  width:60px;
-  height:4px;
-  margin-top:8px;
-  background:linear-gradient(90deg,#ff4081,#ff80ab);
-  border-radius:6px;
+  content: "";
+  display: block;
+  width: 70px;
+  height: 4px;
+  background: linear-gradient(90deg, #ff4081, #ff80ab);
+  margin-top: 10px;
+  border-radius: 5px;
 }
 
-/* ---- Buttons ---- */
+/* ---- Variables ---- */
+:root {
+  --bg: #111;
+  --text: #fff;
+  --card: #1e1e1e;
+}
+
+body.light {
+  --bg: #f4f4f4;
+  --text: #000;
+  --card: #fff;
+}
+
+/* ---- Body ---- */
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: 0.3s;
+}
+
+h1 { text-align: center; }
+
+/* ---- Top bar ---- */
 .top-bar {
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 button {
-  padding:12px 16px;
-  border:none;
-  border-radius:10px;
-  background:#007bff;
-  color:#fff;
-  font-size:16px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  transition: transform 0.1s ease;
 }
 
-button:active { transform:scale(.95); }
+button:active { transform: scale(0.92); }
 
-/* ---- CLEAN GRID ---- */
+/* ---- Gallery ---- */
 .gallery {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-  gap:14px;
+  column-count: 4;
+  column-gap: 18px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-/* ---- CARD ---- */
+.gallery.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .item {
-  position:relative;
-  overflow:hidden;
-  border-radius:14px;
-  background:var(--card);
-  aspect-ratio:3/4;
+  break-inside: avoid;
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
 }
 
-/* ---- IMAGE ---- */
+/* Skeleton loader */
 .item img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  opacity:0;
-  transition:opacity .4s ease;
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+  user-select: none;
+  pointer-events: none;
+
+  /* skeleton effect */
+  background: #333;
+  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
-.item img.loaded { opacity:1; }
+.item img.loaded {
+  opacity: 1;
+  transform: translateY(0);
+  animation: none;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ---- Download icon ---- */
+.download {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 10px;
+  border-radius: 50%;
+  font-size: 18px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease, opacity 0.3s;
+}
+
+.hide-downloads .download {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
 
 /* ---- Watermark ---- */
 .watermark {
-  position:absolute;
-  bottom:8px;
-  left:10px;
-  font-size:12px;
-  opacity:.6;
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  font-size: 12px;
+  opacity: 0.6;
 }
 
-/* ---- Download ---- */
-.download {
-  position:absolute;
-  bottom:8px;
-  right:8px;
-  background:rgba(0,0,0,.6);
-  padding:8px;
-  border-radius:50%;
-  color:#fff;
-  text-decoration:none;
-}
-
-/* ---- Lightbox ---- */
-.lightbox {
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.95);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-
-.lightbox img {
-  max-width:100%;
-  max-height:100%;
-}
-
-.lightbox.show { display:flex; }
-
-/* ---- Floating buttons ---- */
+/* ---- Jump buttons ---- */
 .jump-btn {
-  position:fixed;
-  right:18px;
-  bottom:18px;
-  padding:14px 18px;
-  border-radius:50px;
-  background:var(--accent);
-  color:#fff;
-  z-index:999;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 14px 18px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  background: #ff4081;
+  color: white;
+  font-size: 16px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+  transition: transform 0.1s ease;
 }
+
+.jump-btn:active { transform: scale(0.92); }
 
 .top-btn {
-  bottom:70px;
-  background:#00c853;
-  display:none;
+  bottom: 70px;
+  background: #00c853;
+  display: none;
 }
 
-/* ---- Music Toggle ---- */
-.music-btn {
-  position:fixed;
-  left:18px;
-  bottom:18px;
-  width:52px;
-  height:52px;
-  border-radius:50%;
-  background:#222;
-  color:#fff;
-  font-size:22px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
+/* ---- Music toggle button ---- */
+.music-toggle {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #ff4081;
+  color: #fff;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  font-size: 16px;
+  transition: transform 0.1s ease;
+  z-index: 9999;
 }
 
-/* ---- Mobile ---- */
-@media(max-width:480px){
-  .gallery {
-    grid-template-columns:repeat(2,1fr);
-  }
-}
+.music-toggle:active { transform: scale(0.92); }
 
-.hidden{display:none;}
-</style>
+/* ---- Responsive ---- */
+@media (max-width: 1000px) { .gallery { column-count: 3; } }
+@media (max-width: 700px) { .gallery { column-count: 2; } }
+@media (max-width: 450px) { .gallery { column-count: 1; } }
+
+.hidden { display: none; }
+  </style>
 </head>
 
 <body>
-
-<button class="jump-btn" onclick="goToQuotes()">👀</button>
-<button class="jump-btn top-btn" onclick="goToTop()">⬆</button>
-
-<!-- MUSIC BUTTON -->
-<button class="music-btn" id="musicBtn" onclick="toggleMusic()">🎵</button>
+<button class="jump-btn" onclick="goToQuotes()">👀 Watch out</button>
+<button class="jump-btn top-btn" onclick="goToTop()">⬆ Top</button>
+<button class="music-toggle" onclick="toggleMusic()">🎵 Play / Pause</button>
 
 <audio id="bgMusic" loop>
   <source src="music/bg.mp3" type="audio/mpeg">
 </audio>
 
-<h1>liviiii.fr 🍂</h1>
+<h1> liviiii.fr 🍂</h1>
 
 <div class="top-bar">
-  <button onclick="toggleMode()">🌓 Mode</button>
-  <button onclick="downloadZip()">📦 Download</button>
-  <button onclick="unlock()">🔐 Hidden</button>
+  <button onclick="toggleMode()">🌓 Dark / Light</button>
+  <button onclick="downloadZip()">📦 Download All (ZIP)</button>
+  <button onclick="unlock()">🔐 Hidden Gallery</button>
 </div>
 
 <h2>🔥 Skins Hand Picked</h2>
@@ -209,112 +238,127 @@ button:active { transform:scale(.95); }
 <div class="gallery" id="quotes"></div>
 
 <h2 class="hidden" id="hiddenTitle">🕶 Private Album</h2>
-<div class="gallery hidden" id="private"></div>
-
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <img id="lightboxImg">
+<div class="gallery hidden" id="private">
+  <div class="item">
+    <img src="photos/private1.jpg">
+    <span class="watermark">𝓲𝓼𝓪𝓪𝓬 🅴</span>
+    <a class="download" href="photos/private1.jpg" download>🡇</a>
+  </div>
 </div>
 
 <script>
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
+
 const PUBLIC_COUNT = 67;
 const QUOTES_COUNT = 31;
-const BATCH = 12;
 
 const music = document.getElementById("bgMusic");
-const musicBtn = document.getElementById("musicBtn");
+document.body.addEventListener("click", () => {
+  if (music.paused) music.play().catch(() => {});
+}, { once: true });
 
-/* Auto play on first tap (mobile-safe) */
-document.body.addEventListener("click",()=>{
-  if(music.paused){
-    music.play().catch(()=>{});
-  }
-},{once:true});
+function toggleMode() { document.body.classList.toggle("light"); }
 
-function toggleMusic(){
-  if(music.paused){
-    music.play();
-    musicBtn.textContent="🎵";
-  }else{
-    music.pause();
-    musicBtn.textContent="🔇";
+function unlock() {
+  const pass = prompt("Enter password:");
+  if (pass === "1234") {
+    document.getElementById("private").classList.remove("hidden");
+    document.getElementById("hiddenTitle").classList.remove("hidden");
+    alert("Unlocked 🔓");
+  } else {
+    alert("Sorry Bruhh ❌");
   }
 }
 
-function toggleMode(){document.body.classList.toggle("light");}
+async function downloadZip() {
+  const zip = new JSZip();
+  const images = [];
+  for (let i = 1; i <= PUBLIC_COUNT; i++) images.push(`photos/photo${i}.jpg`);
 
-function unlock(){
-  if(prompt("Password")==="6677"){
-    private.classList.remove("hidden");
-    hiddenTitle.classList.remove("hidden");
+  for (let img of images) {
+    const res = await fetch(img);
+    if (!res.ok) continue;
+    const blob = await res.blob();
+    zip.file(img.split("/")[1], blob);
+  }
+
+  const content = await zip.generateAsync({ type: "blob" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(content);
+  a.download = "photos.zip";
+  a.click();
+}
+
+function loadGallery(folder, count, prefix, targetId) {
+  const container = document.getElementById(targetId);
+  for (let i = 1; i <= count; i++) {
+    const div = document.createElement('div');
+    div.className = 'item';
+
+    const img = document.createElement('img');
+    img.src = `${folder}/${prefix}${i}.jpg`;
+    img.loading = 'lazy';
+    img.onload = () => setTimeout(() => img.classList.add('loaded'), i*50);
+
+    const wm = document.createElement('span');
+    wm.className = 'watermark';
+    wm.textContent = '𝓲𝓼𝓪𝓪𝓬 🅴';
+
+    const dl = document.createElement('a');
+    dl.className = 'download';
+    dl.href = img.src;
+    dl.download = '';
+    dl.textContent = '🡇';
+
+    div.appendChild(img);
+    div.appendChild(wm);
+    div.appendChild(dl);
+    container.appendChild(div);
   }
 }
 
-/* ---- Progressive Load ---- */
-function loadGallery(folder,count,prefix,id){
-  const container=document.getElementById(id);
-  let loaded=0;
+// load galleries
+loadGallery("photos", PUBLIC_COUNT, "photo", "public");
+loadGallery("quotes", QUOTES_COUNT, "quote", "quotes");
 
-  function loadBatch(){
-    for(let i=0;i<BATCH && loaded<count;i++){
-      loaded++;
-      const item=document.createElement("div");
-      item.className="item";
-
-      const img=document.createElement("img");
-      img.src=`${folder}/${prefix}${loaded}.jpg`;
-      img.loading="lazy";
-      img.onload=()=>img.classList.add("loaded");
-      img.onclick=()=>openLightbox(img.src);
-
-      const wm=document.createElement("span");
-      wm.className="watermark";
-      wm.textContent="𝓲𝓼𝓪𝓪𝓬 🅴";
-
-      const dl=document.createElement("a");
-      dl.className="download";
-      dl.href=img.src;
-      dl.download="";
-      dl.textContent="⬇";
-
-      item.append(img,wm,dl);
-      container.appendChild(item);
-    }
-  }
-
-  loadBatch();
-  window.addEventListener("scroll",()=>{
-    if(window.innerHeight+window.scrollY>=document.body.offsetHeight-300){
-      loadBatch();
-    }
-  });
+function toggleMusic() {
+  if (music.paused) music.play();
+  else music.pause();
 }
 
-/* ---- Lightbox ---- */
-function openLightbox(src){
-  lightboxImg.src=src;
-  lightbox.classList.add("show");
-}
-function closeLightbox(){
-  lightbox.classList.remove("show");
+function goToQuotes() {
+  document.getElementById("quotesSection").scrollIntoView({ behavior: "smooth" });
 }
 
-/* ---- Nav ---- */
-function goToQuotes(){
-  quotesSection.scrollIntoView({behavior:"smooth"});
-}
-function goToTop(){
-  window.scrollTo({top:0,behavior:"smooth"});
-}
+const jumpBtn = document.querySelector(".jump-btn:not(.top-btn)");
+const quotesSection = document.getElementById("quotesSection");
+const topBtn = document.querySelector(".top-btn");
+let scrollTimeout;
 
-window.addEventListener("scroll",()=>{
-  document.querySelector(".top-btn").style.display =
-    window.scrollY>500?"block":"none";
+window.addEventListener("scroll", () => {
+  document.body.classList.add("hide-downloads");
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(() => document.body.classList.remove("hide-downloads"), 250);
+
+  topBtn.style.display = window.scrollY > 500 ? "block" : "none";
+  const rect = quotesSection.getBoundingClientRect();
+  jumpBtn.style.display = rect.top < 100 ? "none" : "block";
 });
 
-/* ---- Load ---- */
-loadGallery("photos",PUBLIC_COUNT,"photo","public");
-loadGallery("quotes",QUOTES_COUNT,"quote","quotes");
+function goToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); }
+
+// fade-in sections on scroll
+function observeSections() {
+  const sections = document.querySelectorAll('.gallery');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+  sections.forEach(sec => observer.observe(sec));
+}
+observeSections();
 </script>
 
 </body>
